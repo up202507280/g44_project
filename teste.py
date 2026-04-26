@@ -1,6 +1,6 @@
 import sqlite3
 
-conn = sqlite3.connect('Base de Dados/mining.db')
+conn = sqlite3.connect('data/mining.db')
 cursor = conn.cursor()
 cursor.execute('DELETE FROM Transactions')
 cursor.execute('DELETE FROM Inspection')
@@ -16,11 +16,11 @@ from classes.site import Site
 from classes.inspection import Inspection
 from classes.transactions import Transactions
 
-Category.read('Base de Dados/mining.db')
-Company.read('Base de Dados/mining.db')
-Site.read('Base de Dados/mining.db')
-Inspection.read('Base de Dados/mining.db')
-Transactions.read('Base de Dados/mining.db')
+Category.read('data/mining.db')
+Company.read('data/mining.db')
+Site.read('data/mining.db')
+Inspection.read('data/mining.db')
+Transactions.read('data/mining.db')
 
 if len(Category.lst) == 0:
     cat1 = Category(0, "Bauxita")
