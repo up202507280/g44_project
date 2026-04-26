@@ -9,7 +9,7 @@ class Category(Gclass):
     header = 'Category'
     des = ['Id','Name']
     
-    def __init__(self, id, name):
+    def __init__(self, id, name): 
         super().__init__()
         id = Category.get_id(id)
         self._id = id
