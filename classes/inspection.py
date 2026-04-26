@@ -27,7 +27,8 @@ class Inspection(Gclass):
     @property
     def id(self):
         return self._id
-        
+
+    
     @property
     def info(self):
         return self._info
