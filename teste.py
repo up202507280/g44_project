@@ -4,14 +4,11 @@ from classes.site import Site
 from classes.inspection import Inspection
 from classes.transactions import Transactions
 
-<<<<<<< HEAD
 Category.read('data/mining.db')
 Company.read('data/mining.db')
 Site.read('data/mining.db')
 Inspection.read('data/mining.db')
 Transactions.read('data/mining.db')
-=======
->>>>>>> 7c23ed81119aa159ba3b25d8aa32960e57904cbf
 
 Category.read('data/mining.db')
 Company.read('data/mining.db')
