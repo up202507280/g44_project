@@ -1,14 +1,3 @@
-import sqlite3
-
-conn = sqlite3.connect('data/mining.db')
-cursor = conn.cursor()
-cursor.execute('DELETE FROM Transactions')
-cursor.execute('DELETE FROM Inspection')
-cursor.execute('DELETE FROM Site')
-cursor.execute('DELETE FROM Company')
-cursor.execute('DELETE FROM Category')
-conn.commit()
-conn.close()
 
 from classes.category import Category
 from classes.company import Company
