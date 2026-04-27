@@ -9,6 +9,8 @@ class Inspection(Gclass):
     att = ['_id','_info','_company_id']
     header = 'Inspection'
     des = ['Id','Info','Company_id']
+
+
     
     def __init__(self, id, info, company_id):
         super().__init__()
