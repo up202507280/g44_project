@@ -1,8 +1,8 @@
 from flask import Flask, render_template, request, session
 from classes.company import Company
+from classes.category import Category
 from classes.site import Site
 from classes.transactions import Transactions
-from classes.category import Category
 from classes.inspection import Inspection
 from classes.userlogin import Userlogin
 from datefile import filename
@@ -11,9 +11,9 @@ import subs.index_subs as indexSubs
 
 app = Flask(__name__)
 Company.read(filename + 'mining.db')
+Category.read(filename + 'mining.db')
 Site.read(filename + 'mining.db')
 Transactions.read(filename + 'mining.db')
-Category.read(filename + 'mining.db')
 Inspection.read(filename + 'mining.db')
 Userlogin.read(filename + 'business.db')
 
