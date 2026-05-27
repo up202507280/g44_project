@@ -3,8 +3,8 @@ from flask import render_template, request, session
 
 from classes.company import Company
 from classes.site import Site
-from classes.transactions import Transactions
 from classes.category import Category
+from classes.transactions import Transactions
 from classes.inspection import Inspection
 
 prev_option = ""
@@ -78,64 +78,78 @@ def index(path):
 
     if obj_empresa and option != 'insert' and len(Company.lst) > 0:
         
+        empresa_id_int = int(obj_empresa.id)
+        empresa_id_str = str(obj_empresa.id)
+        
         for inspection_id in Inspection.lst:
             insp_obj = Inspection.obj.get(inspection_id)
             
-            if insp_obj and insp_obj.company_id == obj_empresa.id:
-                
-                lista_inspecoes.append({
-                    "id": insp_obj.id,           
-                    "descricao": insp_obj.info   
-                })
+            if insp_obj:
+                comp_id_na_insp = getattr(insp_obj, 'company_id', getattr(insp_obj, 'company', getattr(insp_obj, 'id_company', None)))
+                if comp_id_na_insp is not None and (int(comp_id_na_insp) == empresa_id_int or str(comp_id_na_insp) == empresa_id_str):
+                    desc = getattr(insp_obj, 'info', getattr(insp_obj, 'descricao', getattr(insp_obj, 'description', 'Sem descrição')))
+                    lista_inspecoes.append({
+                        "id": insp_obj.id,           
+                        "descricao": desc   
+                    })
 
         lista_inspecoes = sorted(lista_inspecoes, key=lambda x: x["id"])
 
-      
-        sites_da_empresa = set()
-        for transactions_id in Transactions.lst:
-            trans = Transactions.obj.get(transactions_id)
-            if trans and trans.company_id == obj_empresa.id:
-                sites_da_empresa.add(trans.site_id)
-
-        for site_id in sites_da_empresa:
-            site_obj = Site.obj.get(site_id)
-            if site_obj:
-                categoria_obj = Category.obj.get(site_obj.category_id)
-                lista_operacoes.append({
-                    "id": site_obj.id,
-                    "local": site_obj.title,
-                    "mineral": categoria_obj.name if categoria_obj else "Não Especificado"
-                })
-
-        lista_operacoes = sorted(lista_operacoes, key=lambda x: x["id"])
-
-
+        ids_dos_sites = set()
         for transactions_id in Transactions.lst:
             trans_obj = Transactions.obj.get(transactions_id)
-            if trans_obj and trans_obj.company_id == obj_empresa.id:
-                site_obj = Site.obj.get(trans_obj.site_id)
+            if trans_obj:
+                comp_id_na_trans = getattr(trans_obj, 'company_id', getattr(trans_obj, 'company', getattr(trans_obj, 'id_company', None)))
                 
-                if isinstance(trans_obj.date, datetime.date):
-                    t_date = trans_obj.date.strftime("%Y-%m-%d")
-                else:
-                    t_date = str(trans_obj.date).split()[0] if trans_obj.date else ""
-                
-                
-                if isinstance(trans_obj.amount, (float, int)):
-                    valor_formatado = f"{trans_obj.amount:,.2f} €"
-                else:
-                    valor_formatado = f"{trans_obj.amount} €"
+                if comp_id_na_trans is not None and (int(comp_id_na_trans) == empresa_id_int or str(comp_id_na_trans) == empresa_id_str):
+                    s_id = getattr(trans_obj, 'site_id', getattr(trans_obj, 'site', getattr(trans_obj, 'id_site', None)))
+                    
+                    
+                    if s_id is not None:
+                        ids_dos_sites.add(int(s_id))
+                    
+                    site_obj = Site.obj.get(s_id) if s_id is not None else None
+                    
+                    t_date_raw = getattr(trans_obj, 'date', getattr(trans_obj, 'data', ''))
+                    if isinstance(t_date_raw, datetime.date):
+                        t_date = t_date_raw.strftime("%Y-%m-%d")
+                    else:
+                        t_date = str(t_date_raw).split()[0] if t_date_raw else ""
+                    
+                    t_amount = getattr(trans_obj, 'amount', getattr(trans_obj, 'valor', 0))
+                    if isinstance(t_amount, (float, int)):
+                        valor_formatado = f"{t_amount:,.2f} €"
+                    else:
+                        valor_formatado = f"{t_amount} €"
 
-                lista_transacoes.append({
-                    "id": trans_obj.id,
-                    "site": site_obj.title if site_obj else f"ID: {trans_obj.site_id}",
-                    "valor": valor_formatado,
-                    "data": t_date
-                })
+                    s_title = getattr(site_obj, 'title', getattr(site_obj, 'local', getattr(site_obj, 'nome', f"ID: {s_id}"))) if site_obj else f"ID: {s_id}"
 
+                    lista_transacoes.append({
+                        "id": trans_obj.id,
+                        "site": s_title,
+                        "valor": valor_formatado,
+                        "data": t_date
+                    })
         lista_transacoes = sorted(lista_transacoes, key=lambda x: x["id"])
+
+
+        for site_id in ids_dos_sites:
+            site_obj = Site.obj.get(site_id)
+            if site_obj:
+                cat_id = getattr(site_obj, 'category_id', getattr(site_obj, 'category', getattr(site_obj, 'id_category', None)))
+                categoria_obj = Category.obj.get(cat_id) if cat_id is not None else None
+                
+                s_local = getattr(site_obj, 'title', getattr(site_obj, 'local', getattr(site_obj, 'nome', 'Desconhecido')))
+                c_name = getattr(categoria_obj, 'name', getattr(categoria_obj, 'title', getattr(categoria_obj, 'nome', 'Não Especificado'))) if categoria_obj else "Não Especificado"
+
+                lista_operacoes.append({
+                    "id": site_obj.id,
+                    "local": s_local,
+                    "mineral": c_name
+                })
+        lista_operacoes = sorted(lista_operacoes, key=lambda x: x["id"])
 
     return render_template("index.html", butshow=butshow, butedit=butedit, 
                     id=id, name=name, dob=dob, current_action=current_action,
                     lista_inspecoes=lista_inspecoes, lista_operacoes=lista_operacoes, lista_transacoes=lista_transacoes,
-                    ulogin=session.get("user"))    
+                    ulogin=session.get("user"))
