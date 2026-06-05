@@ -1,1 +1,81 @@
-{% extends 'base.html' %}{% block title %}        <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">{% endblock %}{% block content %}            <div class="abas-navegacao">                <a href="/" class="aba-item">🏢 Company</a>                <a href="/Inspection" class="aba-item ativa">🔍 Inspection</a>                <a href="/Site" class="aba-item">📍 Site</a>                <a href="/Transactions" class="aba-item">💰 Transactions</a>                <a href="/Userlogin" class="aba-item">👤 Userlogin</a>        </div>        <div style="margin-bottom: 20px;">                <a href="/" class="btn" style="background-color: var(--secondary); color: white; border: none; padding: 8px 15px; text-decoration: none; display: inline-block; border-radius: 4px;">⬅️ Voltar à Ficha da Empresa</a>        </div>        <h2>Registos de Inspection da Empresa: <span style="color: var(--primary);">{{ name }}</span></h2>            <div class="box">                <h3 class="titulo-aba">Inspeções Realizadas</h3>                <table>                        <thead>                                <tr>                                        <th style="width: 100px;">ID Insp.</th>                                        <th>Descrição / Notas da Inspeção</th>                                        <th style="width: 160px; text-align: center;">Ações</th>                                </tr>                        </thead>                        <tbody>                                {% for insp in lista_inspecoes %}                                <tr>                                        <td><strong>#{{ insp.id }}</strong></td>                                        <td>{{ insp.descricao }}</td>                                        <td style="text-align: center;">                        <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">                            <a href="/Inspection?action=edit&insp_id={{ insp.id }}#formulario-inspecao" class="btn" style="background-color: #eab308; color: white; border: none; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 0.85rem; font-weight: bold; display: inline-block;">Editar</a>                                                        <a href="/Inspection?action=delete&insp_id={{ insp.id }}" class="btn" onclick="return confirm('Tens a certeza que queres apagar esta inspeção?');" style="background-color: #b91c1c; color: white; border: none; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 0.85rem; font-weight: bold; display: inline-block;">Apagar</a>                        </div>                    </td>                                </tr>                                {% else %}                                <tr><td colspan="3" style="color: #94a3b8; text-align: center; font-style: italic; padding: 20px;">Nenhuma inspeção registada para esta empresa.</td></tr>                                {% endfor %}                        </tbody>                </table>        </div>        <div id="formulario-inspecao" class="box" style="margin-bottom: 20px; border: 2px solid {% if modo_edicao %}#eab308{% else %}var(--primary){% endif %};">                <h3 class="titulo-aba" style="color: {% if modo_edicao %}#eab308{% else %}var(--primary){% endif %};">            {% if modo_edicao %}✏️ EDITAR INSPEÇÃO #{{ inspecao_editando.id }}{% else %}📝 NOVA INSPEÇÃO (SISTEMA ATIVADO){% endif %}        </h3>                        {% if msg_erro %}            <div style="background-color: #fee2e2; color: #991b1b; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-weight: bold;">⚠️ {{ msg_erro }}</div>        {% endif %}        <form action="/Inspection" method="POST" style="display: flex; flex-direction: column; gap: 15px; margin-top: 10px;">                        <input type="hidden" name="action_type" value="{{ 'edit' if modo_edicao else 'insert' }}">            {% if modo_edicao %}                <input type="hidden" name="insp_id" value="{{ inspecao_editando.id }}">            {% endif %}            <div>                                <label for="descricao" style="display: block; font-weight: bold; margin-bottom: 5px;">Escreva os detalhes ou notas técnicas da inspeção:</label>                                <textarea id="descricao" name="descricao" rows="3" placeholder="Digita as notas aqui..." required style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: inherit;">{{ inspecao_editando.descricao if modo_edicao else '' }}</textarea>                        </div>                                    <div style="display: flex; gap: 10px;">                                <button type="submit" class="btn" style="background-color: {% if modo_edicao %}#eab308{% else %}var(--primary){% endif %}; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; flex: 1;">                                        {% if modo_edicao %}💾 ATUALIZAR INSPEÇÃO NA BASE DE DADOS{% else %}💾 GRAVAR INSPEÇÃO NA BASE DE DADOS{% endif %}                </button>                            {% if modo_edicao %}                    <a href="/Inspection" class="btn" style="background-color: #64748b; color: white; border: none; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: bold; text-align: center; display: inline-block; line-height: 20px;">❌ Cancelar</a>                {% endif %}            </div>                </form>        </div>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+{% endblock %}
+
+{% block content %}        
+    <div class="abas-navegacao">        
+        <a href="/" class="aba-item">🏢 Company</a>        
+        <a href="/Inspection" class="aba-item ativa">🔍 Inspection</a>        
+        <a href="/Site" class="aba-item">📍 Site</a>        
+        <a href="/Transactions" class="aba-item">💰 Transactions</a>        
+        <a href="/Userlogin" class="aba-item">👤 Userlogin</a>    
+    </div>    
+
+    <div style="margin-bottom: 20px;">        
+        <a href="/" class="btn" style="background-color: var(--secondary); color: white; border: none; padding: 8px 15px; text-decoration: none; display: inline-block; border-radius: 4px;">⬅️ Voltar à Ficha da Empresa</a>    
+    </div>    
+
+    <h2>Registos de Inspection da Empresa: <span style="color: var(--primary);">{{ name }}</span></h2>        
+
+    <div class="box">        
+        <h3 class="titulo-aba">Inspeções Realizadas</h3>        
+        <table>            
+            <thead>                
+                <tr>                    
+                    <th style="width: 100px;">ID Insp.</th>                    
+                    <th>Descrição / Notas da Inspeção</th>                    
+                    <th style="width: 160px; text-align: center;">Ações</th>                
+                </tr>            
+            </thead>            
+            <tbody>                
+                {% for insp in lista_inspecoes %}                
+                <tr>                    
+                    <td><strong>#{{ insp.id }}</strong></td>                    
+                    <td>{{ insp.descricao }}</td>                    
+                    <td style="text-align: center;">
+                        <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+                            <a href="/Inspection?action=edit&insp_id={{ insp.id }}#formulario-inspecao" class="btn" style="background-color: #eab308; color: white; border: none; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 0.85rem; font-weight: bold; display: inline-block;">Editar</a>
+                            
+                            <a href="/Inspection?action=delete&insp_id={{ insp.id }}" class="btn" onclick="return confirm('Tens a certeza que queres apagar esta inspeção?');" style="background-color: #b91c1c; color: white; border: none; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-size: 0.85rem; font-weight: bold; display: inline-block;">Apagar</a>
+                        </div>
+                    </td>                
+                </tr>                
+                {% else %}                
+                <tr><td colspan="3" style="color: #94a3b8; text-align: center; font-style: italic; padding: 20px;">Nenhuma inspeção registada para esta empresa.</td></tr>                
+                {% endfor %}            
+            </tbody>        
+        </table>    
+    </div>    
+
+    <div id="formulario-inspecao" class="box" style="margin-bottom: 20px; border: 2px solid {% if modo_edicao %}#eab308{% else %}var(--primary){% endif %};">        
+        <h3 class="titulo-aba" style="color: {% if modo_edicao %}#eab308{% else %}var(--primary){% endif %};">
+            {% if modo_edicao %}✏️ EDITAR INSPEÇÃO #{{ inspecao_editando.id }}{% else %}📝 NOVA INSPEÇÃO (SISTEMA ATIVADO){% endif %}
+        </h3>        
+        
+        {% if msg_erro %}
+            <div style="background-color: #fee2e2; color: #991b1b; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-weight: bold;">⚠️ {{ msg_erro }}</div>
+        {% endif %}
+
+        <form action="/Inspection" method="POST" style="display: flex; flex-direction: column; gap: 15px; margin-top: 10px;">            
+            <input type="hidden" name="action_type" value="{{ 'edit' if modo_edicao else 'insert' }}">
+            {% if modo_edicao %}
+                <input type="hidden" name="insp_id" value="{{ inspecao_editando.id }}">
+            {% endif %}
+
+            <div>                
+                <label for="descricao" style="display: block; font-weight: bold; margin-bottom: 5px;">Escreva os detalhes ou notas técnicas da inspeção:</label>                
+                <textarea id="descricao" name="descricao" rows="3" placeholder="Digita as notas aqui..." required style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: inherit;">{{ inspecao_editando.descricao if modo_edicao else '' }}</textarea>            
+            </div>            
+            
+            <div style="display: flex; gap: 10px;">                
+                <button type="submit" class="btn" style="background-color: {% if modo_edicao %}#eab308{% else %}var(--primary){% endif %}; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; flex: 1;">                    
+                    {% if modo_edicao %}💾 ATUALIZAR INSPEÇÃO NA BASE DE DADOS{% else %}💾 GRAVAR INSPEÇÃO NA BASE DE DADOS{% endif %}
+                </button>            
+                {% if modo_edicao %}
+                    <a href="/Inspection" class="btn" style="background-color: #64748b; color: white; border: none; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: bold; text-align: center; display: inline-block; line-height: 20px;">❌ Cancelar</a>
+                {% endif %}
+            </div>        
+        </form>    
+    </div>
+{% endblock %}
