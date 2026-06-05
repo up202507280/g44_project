@@ -19,7 +19,7 @@ class Company(Gclass):
         
         Company.obj[id] = self
         Company.lst.append(id)
-        
+
     @property
     def id(self):
         return self._id
