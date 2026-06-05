@@ -59,6 +59,14 @@ class Transactions(Gclass):
     def company_id(self):
         return self._company_id
         
+    @company_id.setter
+    def company_id(self, company_id):
+        self._company_id = company_id
+
     @property
     def site_id(self):
         return self._site_id
+        
+    @site_id.setter
+    def site_id(self, site_id):
+        self._site_id = site_id
