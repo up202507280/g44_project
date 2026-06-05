@@ -62,4 +62,3 @@ class Transactions(Gclass):
     @property
     def site_id(self):
         return self._site_id
-        
