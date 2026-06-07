@@ -1,1 +1,84 @@
-{% extends 'base.html' %}{% block title %}    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">{% endblock %}{% block content %}        <div class="abas-navegacao">        <a href="/" class="aba-item">🏢 Company</a>        <a href="/Inspection" class="aba-item">🔍 Inspection</a>        <a href="/Site" class="aba-item">📍 Site</a>        <a href="/Transactions" class="aba-item ativa">💰 Transactions</a>        <a href="/Userlogin" class="aba-item">👤 Userlogin</a>    </div>    <div style="margin-bottom: 20px;">        <a href="/" class="btn" style="background-color: var(--secondary); color: white; border: none; padding: 8px 15px; text-decoration: none; display: inline-block; border-radius: 4px;">⬅️ Voltar à Ficha da Empresa</a>    </div>    <h2>Registos de Transactions da Empresa: <span style="color: var(--primary);">{{ name }}</span></h2>        <div class="box">        <h3 class="titulo-aba">Histórico Financeiro</h3>        <table>            <thead>                <tr>                    <th style="width: 120px;">ID Transação</th>                    <th>Sítio Operacional</th>                    <th>Data Movimento</th>                    <th style="text-align: right;">Valor Líquido</th>                </tr>            </thead>            <tbody>                {% for trans in lista_transacoes %}                <tr>                    <td><strong>#{{ trans.id }}</strong></td>                    <td>{{ trans.site }}</td>                    <td>{{ trans.data }}</td>                    <td style="text-align: right; color: #0f172a; font-weight: 600;">{{ trans.valor }}</td>                </tr>                {% else %}                <tr><td colspan="4" style="color: #94a3b8; text-align: center; font-style: italic;">Nenhuma movimentação financeira registada para esta empresa.</td></tr>                {% endfor %}            </tbody>        </table>    </div>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+{% endblock %}
+{% block content %}
+
+    <div class="box" style="margin-bottom: 20px; border: 2px solid {% if edit_trans %}#f59e0b{% else %}var(--primary){% endif %};">
+        <h3 class="titulo-aba" style="color: {% if edit_trans %}#f59e0b{% else %}var(--primary){% endif %};">
+        {% if msg_erro %}
+        <div style="background-color: #fee2e2; color: #991b1b; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-weight: bold;">⚠️ {{ msg_erro }}</div>
+        {% endif %}
+            {% if edit_trans %}Editar Transação #{{ edit_trans.id }}{% else %}Nova Transação{% endif %}
+        </h3>
+        
+        <form action="/Transactions" method="POST" style="display: flex; flex-direction: column; gap: 15px; margin-top: 10px;">
+            <input type="hidden" name="action_type" value="{% if edit_trans %}edit{% else %}insert{% endif %}">
+            <input type="hidden" name="trans_id" value="{% if edit_trans %}{{ edit_trans.id }}{% else %}0{% endif %}">
+            
+            <div class="grid-detalhes">
+                <div>
+                    <label for="data" style="display: block; font-weight: bold; margin-bottom: 5px;">Data do Movimento:</label>
+                    <input type="date" id="data" name="data" value="{% if edit_trans %}{{ edit_trans.date }}{% endif %}" required style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: inherit;">
+                </div>
+                <div>
+                    <label for="valor" style="display: block; font-weight: bold; margin-bottom: 5px;">Valor Líquido (€):</label>
+                    <input type="number" step="0.01" id="valor" name="valor" value="{% if edit_trans %}{{ edit_trans.amount }}{% endif %}" placeholder="Ex: 5000.50" required style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: inherit;">
+                </div>
+            </div>
+            
+            <div>
+                <label for="site_id" style="display: block; font-weight: bold; margin-bottom: 5px;">Sítio Operacional Alvo:</label>
+                <select id="site_id" name="site_id" required style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: inherit; background-color: white;">
+                    <option value="" disabled {% if not edit_trans %}selected{% endif %}>Selecione um Site da lista...</option>
+                    {% for site in lista_sites %}
+                        <option value="{{ site.id }}" {% if edit_trans and edit_trans.site_id == site.id %}selected{% endif %}>#{{ site.id }} - {{ site.title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div style="margin-top: 10px; display: flex; gap: 10px;">
+                <button type="submit" class="btn" style="background-color: {% if edit_trans %}#f59e0b{% else %}var(--primary){% endif %}; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%;">
+                    {% if edit_trans %}Atualizar Transação{% else %}Gravar Transação {% endif %}
+                </button>
+                
+                {% if edit_trans %}
+                <a href="/Transactions" class="btn" style="background-color: var(--secondary); color: white; border: none; padding: 10px 20px; border-radius: 4px; text-decoration: none; text-align: center; font-weight: bold;">Cancelar</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <h2>Registos de Transações da Empresa: <span style="color: var(--primary);">{{ name }}</span></h2>
+    
+    <div class="box">
+        <h3 class="titulo-aba">Histórico Financeiro</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 120px;">ID Transação</th>
+                    <th>Sítio Operacional</th>
+                    <th>Data de Movimento</th>
+                    <th style="text-align: right;">Valor Líquido</th>
+                    <th style="text-align: center; width: 140px;">Ações</th> 
+                </tr>
+            </thead>
+            <tbody>
+                {% for trans in lista_transacoes %}
+                <tr>
+                    <td><strong>#{{ trans.id }}</strong></td>
+                    <td>{{ trans.site }}</td>
+                    <td>{{ trans.data }}</td>
+                    <td style="text-align: right; color: #0f172a; font-weight: 600;">{{ trans.valor }}</td>
+                    <td style="text-align: center;">
+                        <a href="/Transactions?action=edit&trans_id={{ trans.id }}" class="btn" style="padding: 4px 8px; font-size: 0.8rem; background-color: #f59e0b; color: white; border: none; border-radius: 4px;">Editar</a>
+                        <a href="/Transactions?action=delete&trans_id={{ trans.id }}" class="btn" onclick="return confirm('Tem a certeza que deseja eliminar a transação #{{ trans.id }}?')" style="padding: 4px 8px; font-size: 0.8rem; background-color: var(--danger); color: white; border: none; border-radius: 4px;">Apagar</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" style="color: #94a3b8; text-align: center; font-style: italic;">Nenhuma movimentação financeira registada para esta empresa.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
