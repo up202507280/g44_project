@@ -1,4 +1,4 @@
-import datetime
+iimport datetime
 from classes.gclass import Gclass
 
 class Company(Gclass):
@@ -19,7 +19,7 @@ class Company(Gclass):
         
         Company.obj[id] = self
         Company.lst.append(id)
-
+        
     @property
     def id(self):
         return self._id
@@ -39,3 +39,4 @@ class Company(Gclass):
     @created_date.setter
     def created_date(self, created_date):
         self._created_date = created_date
+
