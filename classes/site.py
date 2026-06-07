@@ -23,7 +23,7 @@ class Site(Gclass):
             Site.lst.append(id)
         else:
             print('Category ', category_id, ' not found')
-        
+            
     @property
     def id(self):
         return self._id
@@ -46,3 +46,4 @@ class Site(Gclass):
             self._category_id = category_id
         else:
             print('Category ', category_id, ' not found')
+
