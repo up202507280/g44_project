@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+{% endblock %}
+{% block content %}
+    <div class="dados" style="text-align: center;">
+        <img src="data:image/png;base64,{{ image }}" mimetype="image/png" alt="My plot" style="display: block; margin: 0 auto; max-width: 100%;">
+    </div>
+{% endblock %}

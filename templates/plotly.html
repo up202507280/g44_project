@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}        
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="abas-navegacao">           
+    <div class="plot-container" style="padding: 20px;">
+        {{ plot_div | safe }}
+    </div>
+{% endblock %}
