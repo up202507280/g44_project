@@ -64,8 +64,7 @@ def listar_inspecoes():
             comp_id = getattr(insp_obj, '_company', getattr(insp_obj, 'company_id', getattr(insp_obj, 'company', None)))
             if comp_id and not isinstance(comp_id, (int, float, str)):
                 comp_id = getattr(comp_id, 'id', None)
-            
-            # CORREÇÃO CRÍTICA: Compara diretamente com o ID da SESSÃO
+
             if comp_id is not None and int(str(comp_id).replace("<", "").replace(">", "").split()[-1].strip("]")) == int(current_company_id):
                 lista_inspecoes.append({
                     "id": insp_obj.id,
