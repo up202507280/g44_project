@@ -1,11 +1,4 @@
-"""
-@author: António Brito / Carlos Bragança
-(2025) #objective: class Userlogin
-"""""
-# Class User - generic version
-# import sys
 import bcrypt
-# Import the generic class
 from classes.gclass import Gclass
 
 class Userlogin(Gclass):
@@ -13,43 +6,32 @@ class Userlogin(Gclass):
     lst = list()
     pos = 0
     sortkey = ''
-    # class attributes, identifier attribute '_id' must be the first one on the list
     att = ['_id', '_user','_usergroup','_password']
-    # Class header title
     header = 'Users'
-    # field description for use in, for example, in input form
     des = ['Id', 'User','User group','Password']
     username = ''
     user_id = 0
-    # Constructor: Called when an object is instantiated
     def __init__(self, id, user, usergroup, password):
         super().__init__()
-        # Object attributes
         id = Userlogin.get_id(id)
         self._id = id
         self._user = user
         self._usergroup = usergroup
         self._password = password
-        # Add the new object to the dictionary of objects
         Userlogin.obj[id] = self
-        # Add the code to the list of object codes
         Userlogin.lst.append(id)
-    # id property getter method
     @property
     def id(self):
         return self._id
-    # user property getter method
     @property
     def user(self):
         return self._user
-    # usergroup property getter method
     @property
     def usergroup(self):
         return self._usergroup
     @usergroup.setter
     def usergroup(self, usergroup):
         self._usergroup = usergroup
-    # password property
     @property
     def password(self):
         return ""
