@@ -1,7 +1,3 @@
-"""
-@author: António Brito / Carlos Bragança (2025) - Adaptado
-#objective: class Transaction
-"""
 import datetime
 from classes.company import Company
 from classes.site import Site
